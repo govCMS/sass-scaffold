@@ -1,52 +1,129 @@
-# GovCMS Project Scaffolding
+# GovCMS SaaS project
 
-## Known Issues
+[![pipeline status](https://projects.govcms.gov.au/GovCMS/saas-scaffold/badges/master/pipeline.svg)](https://projects.govcms.gov.au/GovCMS/saas-scaffold/commits/master)
 
-* Currently (Nov 2018), all local projects utilise the same LOCALDEV_URL - we are working to fix that.
-* This repository is still a Work-in-Progress, and may be subject to slight alterations
-* This process only applies to the [7.x-3.x](https://github.com/govCMS/govcms/tree/7.x-3.x) branch of GovCMS
+## Requirements
 
-## Requirements and Preliminary Setup
+* [Docker](https://docs.docker.com/install/) - a container management system
+* [pygmy](https://docs.amazee.io/local_docker_development/pygmy.html#installation) (you might need `sudo` for this depending on your ruby configuration)
+* [Ahoy](http://ahoy-cli.readthedocs.io/en/latest/#installation) - a shortcut manager for saving your precious fingers
+* [Portainer](https://portainer.io/install.html) - not critical, but a nice web UI for managing Docker stuff
 
-* [Docker](https://docs.docker.com/install/) - Follow documentation at https://docs.amazee.io/local_docker_development/local_docker_development.html to configure local development environment.
 
-* [Mac/Linux](https://docs.amazee.io/local_docker_development/pygmy.html) - Make sure you don't have anything running on port 80 on the host machine (like a web server):
+## Known issues
 
-        gem install pygmy
-        pygmy up
+1. This process only applies to the `7.x-3.x` branch of GovCMS
+2. Currently (Nov 2018), all local projects utilise the same LOCALDEV_URL. The URL used is hardcoded in. GovCMS is aware and working on a fix. To access different sites, shut down the containers of all except the one you want to see at that URL.
+3. The container 'test' cannot have its name changed. This prevents Drupal from being able to connect to the database for some reason.
+4. When logging into the site for the first time, the 'Reset password' page does not allow resetting the password, complaining  `Password may only be changed in 24 hours from the last change`. See Step 5 of 'Spin up a vanilla govCMS site' for the workaround. 
 
-* [Windows](https://docs.amazee.io/local_docker_development/windows.html):    
 
-        git clone https://github.com/amazeeio/amazeeio-docker-windows amazeeio-docker-windows; cd amazeeio-docker-windows
-        docker-compose up -d; cd ..
 
-* [Ahoy (optional)](http://ahoy-cli.readthedocs.io/en/latest/#installation) - The commands are listed in `.ahoy.yml` all include their docker-compose versions for use on Windows, or on systems without Ahoy.
+## Setup
 
-## Project Setup
+
+### Spin up a vanilla govCMS site
+
+This lets you quickly whip up a site in Docker, but without persistent storage, i.e. **if you shut down your containers, you lose your changes**. 
 
 1. Checkout project repo and confirm the path is in Docker's file sharing config (https://docs.docker.com/docker-for-mac/#file-sharing):
 
-        Mac/Linux: git clone https://www.github.com/govcms/govcms7-scaffold.git {INSERT_PROJECT_NAME} && cd $_
-        Windows:   git clone https://www.github.com/govcms/govcms7-scaffold.git {INSERT_PROJECT_NAME}; cd {INSERT_PROJECT_NAME}
+        git clone https://projects.govcms.gov.au/dof/agency.git govcms-agency && cd $_
+  
+2. Start Pygmy: 
 
-2. Build and start the containers:
+        pygmy up
 
-        Mac/Linux:  ahoy up
-        Windows:    docker-compose up -d
+    **Make sure you don't have anything running on port `80` on the host machine (like an Apache web server from XAMP, WAMP, LAMP etc, or Skype).** If you do, you may need to change the port it runs on.
 
-3. Install GovCMS:
+3. Build and start the Docker containers:
 
-        Mac/Linux:  ahoy install
-        Windows:    docker-compose exec -T test drush si -y govcms
+        ahoy up
 
-4. Login to Drupal:
+4. Install the GovCMS Drupal profile into the new website container:
 
-        Mac/Linux:  ahoy login
-        Windows:    docker-compose exec -T test drush uli
+        ahoy install
 
-## Commands
+5. Update the user account password using Drush:
 
-Additional commands are listed in `.ahoy.yml`, or available from the command line `ahoy -v`
+        ahoy drush upwd admin --password='<your-new-password>'
+
+6. Login to your newly-installed Drupal site using the domain this spits out (the full URL prompts a password reset):
+
+        ahoy login
+
+
+
+## Pushing commits
+
+Before pushing anything back up, you should confirm your local Git user name and email. If this differs from those used by your remote repo account, your commits will show as originating from a different user. 
+
+You can check your global Git user account details by inspecting `user.name` and `user.email` via:
+    
+    git config --list
+
+You can then specify different user details for specific repositories using this:
+
+    git config --local user.name '<your account username>'
+    git config --local user.email <your account email>
+
+
+
+## Importing an existing site from a backup
+
+You can install a base govCMS site from this project, then import your files and database.
+
+
+
+### Importing a database
+
+1. Take a backup of the database of the site you want to import, and compress it
+
+        tar -zcf <database-file>.sql.tar.gz </local-location/database.sql>
+
+2. Copy it into the root directory of the `industry` project 'test' container. You can see  list of the container names with `ahoy ps`
+
+        docker cp <local/file.ext> <containername>:<desired-location-inside-container>
+
+    so:
+
+                docker cp database.sql.tar.gz industry_test_1:/app/
+
+3. Start a new CLI session inside the `test` container, where `"$1"` is the test website container name
+
+        docker exec -it "$1" bash,
+
+4. Empty the database and extract + import the new one. This may take a while depending on the size of your database file.
+
+    (Note the backticks around `drush sql-cli`; these are required, or the import doesn't run. See `drush sql-connect --help`)
+
+        drush sql-drop -y; tar -xf database.sql.tar.gz; `drush sql-cli` < /app/database.sql
+
+5. Exit the `test` container CLI session
+
+        exit
+
+6. Flush the caches and refresh any asset locations
+
+        ahoy drush cc all
+
+
+
+### Importing public files
+
+Currently, files can either be imported into the container, or referenced from the local file system using [Docker Volumes](https://docs.docker.com/storage/volumes/). 
+
+1. Repeat steps 1-3 of the Database import instructions above, but with a compressed archive of your files instead.
+2. Once you've jumped inside the `test` container, extract the files
+
+        tar -xf myfiles.tar.gz -C /app/sites/default/files/
+
+    The `owner` and `group` of the extracted files may differ from those of the container i.e. `root` > `1000`. This shouldn't matter unless you want to edit them. 
+
+3. Check the files are present and accessible by visiting one via the project site URL; `http://govcms.docker.amazee.io/sites/default/files/<example-file.pdf>`
+
+
+
 
 ## Development
 
@@ -55,6 +132,8 @@ Additional commands are listed in `.ahoy.yml`, or available from the command lin
 * The files folder is not (currently) committed to GitLab.
 * Do not make changes to `docker-compose.yml`, `lagoon.yml`, `.gitlab-ci.yml` or the Dockerfiles under `/.docker` - these will result in your project being unable to deploy to GovCMS SaaS
 
+
+
 ## Image inheritance
 
 This project is designed to provision a Drupal 8 project onto GovCMS SaaS, using the GovCMS8 distribution, and has been prepared thus
@@ -62,3 +141,36 @@ This project is designed to provision a Drupal 8 project onto GovCMS SaaS, using
 1. The vanilla GovCMS (7.x-3.x) Distribution is available at [Github Source](https://github.com/govcms/govcms) and as [Public DockerHub images](https://hub.docker.com/r/govcms)
 2. Those GovCMS images are then customised for Lagoon and GovCMS, and are available at [Github Source](https://github.com/govcms/govcmslagoon) and as [Public DockerHub images](https://hub.docker.com/r/govcmslagoon)
 3. Those GovCMSlagoon images are then retrieved in this scaffold repository.
+
+
+## Notes 
+- Unless you import a database dump from another site, the out-of-the-box govCMS site will only contain the user 'admin'.
+- If you import a database dump from a site where your user account is NOT an administrator, you can become one by assiginning your account the administrator role using `ahoy drush urol 'administrator' <account email or user ID>`. The super admin user ID will always be '1'.
+
+
+## Commands
+
+Additional commands are listed in `.ahoy.yml`. You can add anything that make life easier, even motivational quotes.
+
+* View the themes present on your site and see which are enabled
+ 
+        `ahoy drush pm-list --type=theme`
+
+
+# @TODO
+
+Setting up persistent storage (your files and database)
+:   - Anything you don't want to lose when shutting down the containers should live in persistent storage
+   - Mention port mapping, and clashing should you already be running a local server (like a LAMP stack)
+
+Saving your changes in new Container Images
+:   - How can you capture your completed non-code work in a new Image
+
+Connecting to the Docker container repository
+:   - Saving, updating and sharing your work
+
+Tagging Container Images
+:   - For safer release management
+
+Golden rules: Dos and don'ts of containers
+:   - Something easy to consume for govCMS newcomers, and simpler than the official Docker documentation
