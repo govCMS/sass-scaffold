@@ -1,6 +1,25 @@
-# GovCMS SaaS project
+# GovCMS Project Scaffolding
+**For creating new govCMS websites, and/or importing your own**
 
-## Requirements
+
+## Contents 
+
+ - [Requirements](#req)
+ - [Known issues](#issues)
+ - [Pushing commits](#push)
+ - [Spin up a vanilla govCMS site](#new)
+ - [Importing an existing site from a backup](#imp-site)
+ - [Importing a database](#imp-db)
+ - [Importing public files](#imp-files)
+ - [Development](#dev)
+ - [Image inheritance](#img-in)
+ - [Notes](#notes)
+ - [Commands](#comm)
+ - [@TODO](#todo)
+
+
+
+## <a name="req"></a>Requirements
 
 * [Docker](https://docs.docker.com/install/) - a container management system
 * [pygmy](https://docs.amazee.io/local_docker_development/pygmy.html#installation) a dynamic language that compiles to JavaScript (you might need `sudo` for this depending on your ruby configuration)
@@ -8,7 +27,8 @@
 * [Portainer](https://portainer.io/install.html) - optional; a nice web UI for managing Docker stuff
 
 
-## Known issues
+
+## <a name="issues"></a>Known issues
 
 1. This process only applies to the [7.x-3.x branch of GovCMS](https://github.com/govCMS/govcms/tree/7.x-3.x).
 2. Currently (Nov 2018), all local projects utilise the same LOCALDEV_URL. The URL used is hard-coded in. GovCMS is aware and working on a fix. To access different sites, shut down the containers of all except the one you want to see at that URL.
@@ -17,9 +37,26 @@
 5. The `dnsmasq` that ships with the Docker images clashes with Linux Ubuntu 16.04 LTS's default `dnsmasq` service, and throws an error when runnig `pygmy up`. Disabling Ubuntu's dnsmasq service should fix this. 
 
 
-## Setup
 
-### Spin up a vanilla govCMS site
+
+## <a name="push"></a>Pushing commits
+
+Before pushing anything back up, you should check your local Git credentials match those used by your remote repo account. If they don't, your commits will show as originating from a different user. 
+
+You can check your global Git user account details by inspecting `user.name` and `user.email` via:
+    
+        git config --list
+
+You can then specify different user details for specific repositories using this:
+
+        git config --local user.name '<your account username>'
+        git config --local user.email <your account email>
+
+
+
+## <a name="setup"></a>Setup
+
+### <a name="new"></a>Spin up a vanilla govCMS site
 
 This lets you quickly whip up a govCMS template site in Docker, but without persistent storage, i.e. **if you shut down your containers, you lose your changes**. 
 
@@ -57,28 +94,13 @@ This lets you quickly whip up a govCMS template site in Docker, but without pers
 
 
 
-## Pushing commits
-
-Before pushing anything back up, you should confirm your local Git user name and email. If this differs from those used by your remote repo account, your commits will show as originating from a different user. 
-
-You can check your global Git user account details by inspecting `user.name` and `user.email` via:
-    
-        git config --list
-
-You can then specify different user details for specific repositories using this:
-
-        git config --local user.name '<your account username>'
-        git config --local user.email <your account email>
-
-
-
-## Importing an existing site from a backup
+## <a name="imp-site"></a>Importing an existing site from a backup
 
 You can install a base govCMS site from this project, then import your files and database.
 
 
 
-### Importing a database
+### <a name="imp-db"></a>Importing a database
 
 1. Take a backup of the database of the site you want to import, and compress it
 
@@ -113,7 +135,7 @@ You can install a base govCMS site from this project, then import your files and
 
 
 
-### Importing public files
+### <a name="imp-files"></a>Importing public files
 
 Currently, files can either be imported into the container, or referenced from the local file system using [Docker Volumes](https://docs.docker.com/storage/volumes/). 
 
@@ -129,7 +151,7 @@ Currently, files can either be imported into the container, or referenced from t
 
 
 
-## Development
+## <a name="dev"></a>Development
 
 * You should create your theme(s) in folders under `/themes`
 * Tests specific to your site can be committed to the `/tests` folders
@@ -138,7 +160,7 @@ Currently, files can either be imported into the container, or referenced from t
 
 
 
-## Image inheritance
+## <a name="img-in"></a>Image inheritance
 
 This project is designed to provision a Drupal 8 project onto GovCMS SaaS, using the GovCMS8 distribution, and has been prepared thus
 
@@ -147,12 +169,12 @@ This project is designed to provision a Drupal 8 project onto GovCMS SaaS, using
 3. Those GovCMSlagoon images are then retrieved in this scaffold repository.
 
 
-## Notes 
+## <a name="notes"></a>Notes 
 - Unless you import a database dump from another site, the out-of-the-box govCMS site will only contain the user 'admin'.
 - If you import a database dump from a site where your user account is NOT an administrator, you can become one by assigning your account the administrator role using `ahoy drush urol 'administrator' <account email or user ID>`. The super admin user ID will always be '1'.
 
 
-## Commands
+## <a name="comm"></a>Commands
 
 Additional commands are listed in `.ahoy.yml`. You can add anything that make life easier, even motivational quotes.
 
@@ -161,7 +183,7 @@ Additional commands are listed in `.ahoy.yml`. You can add anything that make li
         ahoy drush pm-list --type=theme
 
 
-# @TODO
+# <a name="todo"></a>@TODO
 
 Setting up persistent storage (your files and database)
 :   - Anything you don't want to lose when shutting down the containers should live in persistent storage
