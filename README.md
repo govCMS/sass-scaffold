@@ -3,7 +3,7 @@
 ## Requirements
 
 * [Docker](https://docs.docker.com/install/) - a container management system
-* [pygmy](https://docs.amazee.io/local_docker_development/pygmy.html#installation) (you might need `sudo` for this depending on your ruby configuration)
+* [pygmy](https://docs.amazee.io/local_docker_development/pygmy.html#installation) a dynamic language that compiles to JavaScript (you might need `sudo` for this depending on your ruby configuration)
 * [Ahoy](http://ahoy-cli.readthedocs.io/en/latest/#installation) - optional; a shortcut manager for saving your precious fingers
 * [Portainer](https://portainer.io/install.html) - optional; a nice web UI for managing Docker stuff
 
@@ -16,17 +16,18 @@
 4. When logging into the site for the first time, the 'Reset password' page does not allow resetting the password, complaining  `Password may only be changed in 24 hours from the last change`. See Step 5 of 'Spin up a vanilla govCMS site' for the workaround. 
 5. The `dnsmasq` that ships with the Docker images clashes with Linux Ubuntu 16.04 LTS's default `dnsmasq` service, and throws an error when runnig `pygmy up`. Disabling Ubuntu's dnsmasq service should fix this. 
 
-## Setup
 
+## Setup
 
 ### Spin up a vanilla govCMS site
 
-This lets you quickly whip up a site in Docker, but without persistent storage, i.e. **if you shut down your containers, you lose your changes**. 
+This lets you quickly whip up a govCMS template site in Docker, but without persistent storage, i.e. **if you shut down your containers, you lose your changes**. 
 
 1. Checkout project repo and confirm the path is in Docker's file sharing config (https://docs.docker.com/docker-for-mac/#file-sharing):
 
-        git clone https://projects.govcms.gov.au/dof/agency.git govcms-agency && cd $_
-  
+        Clone with HTTPS: git clone https://projects.govcms.gov.au/dof/agency.git govcms-agency && cd $_
+        Clone with SSH:   git clone git://projects.govcms.gov.au:dof/agency.git govcms-agency && cd $_
+
 2. Start Pygmy: 
 
         pygmy up
@@ -35,19 +36,24 @@ This lets you quickly whip up a site in Docker, but without persistent storage, 
 
 3. Build and start the Docker containers:
 
-        ahoy up
+        Ahoy:   ahoy up
+        Docker: docker-compose up -d
 
 4. Install the GovCMS Drupal profile into the new website container:
 
-        ahoy install
+        Ahoy:   ahoy install
+        Docker: docker-compose exec -T test drush si -y govcms
 
 5. Update the user account password using Drush:
 
-        ahoy drush upwd admin --password='<your-new-password>'
+        Ahoy:   ahoy drush upwd admin --password='<your-new-password>'
+        Docker: docker-compose exec -T test drush upwd admin --password='<your-new-password>'
+
 
 6. Login to your newly-installed Drupal site using the domain this spits out (the full URL prompts a password reset):
 
-        ahoy login
+        Ahoy:   ahoy login
+        Docker: docker-compose exec -T test drush uli
 
 
 
@@ -78,7 +84,7 @@ You can install a base govCMS site from this project, then import your files and
 
         tar -zcf <database-file>.sql.tar.gz </local-location/database.sql>
 
-2. Copy it into the root directory of the `industry` project 'test' container. You can see  list of the container names with `ahoy ps`
+2. Copy it into the root directory of the `industry` project 'test' container. You can see list of the container names with `ahoy ps` or `docker-compose ps`
 
         docker cp <local/file.ext> <containername>:<desired-location-inside-container>
 
@@ -100,9 +106,10 @@ You can install a base govCMS site from this project, then import your files and
 
         exit
 
-6. Flush the caches and refresh any asset locations
+6. Flush the caches
 
-        ahoy drush cc all
+        Ahoy:   ahoy drush cc all
+        Docker: docker-compose exec -T test drush cc all
 
 
 
@@ -151,7 +158,7 @@ Additional commands are listed in `.ahoy.yml`. You can add anything that make li
 
 * View the themes present on your site and see which are enabled
  
-        `ahoy drush pm-list --type=theme`
+        ahoy drush pm-list --type=theme
 
 
 # @TODO
