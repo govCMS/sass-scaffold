@@ -1,23 +1,20 @@
 # GovCMS SaaS project
 
-[![pipeline status](https://projects.govcms.gov.au/GovCMS/saas-scaffold/badges/master/pipeline.svg)](https://projects.govcms.gov.au/GovCMS/saas-scaffold/commits/master)
-
 ## Requirements
 
 * [Docker](https://docs.docker.com/install/) - a container management system
 * [pygmy](https://docs.amazee.io/local_docker_development/pygmy.html#installation) (you might need `sudo` for this depending on your ruby configuration)
-* [Ahoy](http://ahoy-cli.readthedocs.io/en/latest/#installation) - a shortcut manager for saving your precious fingers
-* [Portainer](https://portainer.io/install.html) - not critical, but a nice web UI for managing Docker stuff
+* [Ahoy](http://ahoy-cli.readthedocs.io/en/latest/#installation) - optional; a shortcut manager for saving your precious fingers
+* [Portainer](https://portainer.io/install.html) - optional; a nice web UI for managing Docker stuff
 
 
 ## Known issues
 
-1. This process only applies to the `7.x-3.x` branch of GovCMS
-2. Currently (Nov 2018), all local projects utilise the same LOCALDEV_URL. The URL used is hardcoded in. GovCMS is aware and working on a fix. To access different sites, shut down the containers of all except the one you want to see at that URL.
+1. This process only applies to the [7.x-3.x branch of GovCMS](https://github.com/govCMS/govcms/tree/7.x-3.x).
+2. Currently (Nov 2018), all local projects utilise the same LOCALDEV_URL. The URL used is hard-coded in. GovCMS is aware and working on a fix. To access different sites, shut down the containers of all except the one you want to see at that URL.
 3. The container 'test' cannot have its name changed. This prevents Drupal from being able to connect to the database for some reason.
 4. When logging into the site for the first time, the 'Reset password' page does not allow resetting the password, complaining  `Password may only be changed in 24 hours from the last change`. See Step 5 of 'Spin up a vanilla govCMS site' for the workaround. 
-
-
+5. The `dnsmasq` that ships with the Docker images clashes with Linux Ubuntu 16.04 LTS's default `dnsmasq` service, and throws an error when runnig `pygmy up`. Disabling Ubuntu's dnsmasq service should fix this. 
 
 ## Setup
 
@@ -60,12 +57,12 @@ Before pushing anything back up, you should confirm your local Git user name and
 
 You can check your global Git user account details by inspecting `user.name` and `user.email` via:
     
-    git config --list
+        git config --list
 
 You can then specify different user details for specific repositories using this:
 
-    git config --local user.name '<your account username>'
-    git config --local user.email <your account email>
+        git config --local user.name '<your account username>'
+        git config --local user.email <your account email>
 
 
 
@@ -87,7 +84,7 @@ You can install a base govCMS site from this project, then import your files and
 
     so:
 
-                docker cp database.sql.tar.gz industry_test_1:/app/
+        docker cp database.sql.tar.gz industry_test_1:/app/
 
 3. Start a new CLI session inside the `test` container, where `"$1"` is the test website container name
 
@@ -129,7 +126,7 @@ Currently, files can either be imported into the container, or referenced from t
 
 * You should create your theme(s) in folders under `/themes`
 * Tests specific to your site can be committed to the `/tests` folders
-* The files folder is not (currently) committed to GitLab.
+* The files folder is not (currently) committed
 * Do not make changes to `docker-compose.yml`, `lagoon.yml`, `.gitlab-ci.yml` or the Dockerfiles under `/.docker` - these will result in your project being unable to deploy to GovCMS SaaS
 
 
@@ -145,7 +142,7 @@ This project is designed to provision a Drupal 8 project onto GovCMS SaaS, using
 
 ## Notes 
 - Unless you import a database dump from another site, the out-of-the-box govCMS site will only contain the user 'admin'.
-- If you import a database dump from a site where your user account is NOT an administrator, you can become one by assiginning your account the administrator role using `ahoy drush urol 'administrator' <account email or user ID>`. The super admin user ID will always be '1'.
+- If you import a database dump from a site where your user account is NOT an administrator, you can become one by assigning your account the administrator role using `ahoy drush urol 'administrator' <account email or user ID>`. The super admin user ID will always be '1'.
 
 
 ## Commands
@@ -174,3 +171,4 @@ Tagging Container Images
 
 Golden rules: Dos and don'ts of containers
 :   - Something easy to consume for govCMS newcomers, and simpler than the official Docker documentation
+   - Explain what kind of changes should be saved where i.e. in Container Images, the repo, local volumes etc
