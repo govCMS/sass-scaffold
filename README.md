@@ -58,7 +58,7 @@ You can then specify different user details for specific repositories using this
 
 ### <a name="new"></a>Spin up a vanilla govCMS site
 
-This lets you quickly whip up a govCMS template site in Docker, but without persistent storage, i.e. **if you shut down your containers, you lose your changes**. 
+This lets you quickly whip up a govCMS template site in Docker, but without persistent storage, i.e. **if you shut down your containers, you lose any changes made to the website**.
 
 1. Checkout project repo and confirm the path is in Docker's file sharing config (https://docs.docker.com/docker-for-mac/#file-sharing):
 
@@ -102,6 +102,8 @@ You can install a base govCMS site from this project, then import your files and
 
 ### <a name="imp-db"></a>Importing a database
 
+**Note:** The database continer cannot be access from the test container via `mysql -u <username> -p`, and will complain of MySQL not being connected at all. The only way to interact with the database is via Drush. 
+
 1. Take a backup of the database of the site you want to import, and compress it
 
         tar -zcf <database-file>.sql.tar.gz </local-location/database.sql>
@@ -144,7 +146,7 @@ Currently, files can either be imported into the container, or referenced from t
 
         tar -xf myfiles.tar.gz -C /app/sites/default/files/
 
-    The `owner` and `group` of the extracted files may differ from those of the container i.e. `root` > `1000`. This shouldn't matter unless you want to edit them. 
+    The `owner` and `group` of the extracted files may differ from those of the container i.e. `root` > `1000`. This shouldn't matter unless you want to edit them.
 
 3. Check the files are present and accessible by visiting one via the project site URL; `http://govcms.docker.amazee.io/sites/default/files/<example-file.pdf>`
 
@@ -181,7 +183,18 @@ Additional commands are listed in `.ahoy.yml`. You can add anything that make li
 * View the themes present on your site and see which are enabled
  
         ahoy drush pm-list --type=theme
+        
+* View the running containers for the current project
 
+        ahoy ps
+
+* View _all_ running containers
+
+        docker container ls
+
+* Remove all stopped containers from Docker (this is useful if storage space is a concern)
+
+        docker container prune
 
 # <a name="todo"></a>@TODO
 
