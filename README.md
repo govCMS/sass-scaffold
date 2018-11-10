@@ -32,10 +32,10 @@
 
 1. This process only applies to the [7.x-3.x branch of GovCMS](https://github.com/govCMS/govcms/tree/7.x-3.x).
 2. Currently (Nov 2018), all local projects utilise the same LOCALDEV_URL. The URL used is hard-coded in. GovCMS is aware and working on a fix. To access different sites, shut down the containers of all except the one you want to see at that URL.
-3. The container 'test' cannot have its name changed. This prevents Drupal from being able to connect to the database for some reason.
+3. The container `test` cannot have its name changed. This prevents Drupal from being able to connect to the database for some reason.
 4. When logging into the site for the first time, the 'Reset password' page does not allow resetting the password, complaining  `Password may only be changed in 24 hours from the last change`. See Step 5 of 'Spin up a vanilla govCMS site' for the workaround. 
 5. The `dnsmasq` that ships with the Docker images clashes with Linux Ubuntu 16.04 LTS's default `dnsmasq` service, and throws an error when runnig `pygmy up`. Disabling Ubuntu's dnsmasq service should fix this. 
-
+6. The mariadb database cannot be access from the `test` container via `mysql -u <username> -p ...`, and will complain of MySQL not being connected at all. **The only way to interact with the database is via Drush**. You can verify Drupal can talk to the database by running `ahoy drush status --full` and looking for the line reading `Database: connected`.
 
 
 
@@ -101,8 +101,6 @@ You can install a base govCMS site from this project, then import your files and
 
 
 ### <a name="imp-db"></a>Importing a database
-
-**Note:** The database continer cannot be access from the test container via `mysql -u <username> -p`, and will complain of MySQL not being connected at all. The only way to interact with the database is via Drush. 
 
 1. Take a backup of the database of the site you want to import, and compress it
 
