@@ -1,23 +1,26 @@
 version: '2.3'
 
 x-lagoon-project:
-  &lagoon-project govcms-saas
+  &lagoon-project govcms7-scaffold
 
 x-lagoon-local-dev-url:
-  &lagoon-local-dev-url http://govcms-saas.docker.amazee.io
+  &lagoon-local-dev-url http://govcms7-scaffold.docker.amazee.io
 
 x-volumes:
   &default-volumes
     volumes:
-      - ./themes:/app/profiles/govcms/themes/custom:${VOLUME_FLAGS:-delegated}
+      - ./themes:/app/sites/default/themes/custom:${VOLUME_FLAGS:-delegated}
       - ./files:/app/sites/default/files:delegated
       - ./tests/behat/features:/app/tests/behat/features:${VOLUME_FLAGS:-delegated}
       - ./tests/phpunit/tests:/app/tests/phpunit/tests:${VOLUME_FLAGS:-delegated}
 
 x-environment:
   &default-environment
+    STAGE_FILE_PROXY_URL: ${STAGE_FILE_PROXY_URL:-}
+    LAGOON_ENVIRONMENT_TYPE: ${LAGOON_ENVIRONMENT_TYPE}
     LAGOON_PROJECT: *lagoon-project
-    LAGOON_ROUTE: &default-url ${LOCALDEV_URL:-http://govcms.docker.amazee.io}
+    LAGOON_ROUTE: &default-url ${LOCALDEV_URL:-http://govcms7-scaffold.docker.amazee.io}
+    X_FRAME_OPTIONS: ${X_FRAME_OPTIONS:-SameOrigin}
 
 services:
 
@@ -33,20 +36,6 @@ services:
     << : *default-volumes
     environment:
       << : *default-environment
-
-  # [META:ACSF]
-  acsf:
-    build:
-      context: .
-      dockerfile: .docker/Dockerfile.cli.acsf
-    labels:
-      lagoon.type: cli-persistent
-      lagoon.persistent.name: nginx
-      lagoon.persistent: /app/sites/default/files/
-    << : *default-volumes
-    environment:
-      << : *default-environment
-  # [/META:ACSF]
 
   test:
     build:
@@ -96,9 +85,10 @@ services:
       << : *default-environment
 
   mariadb:
-    image: govcmslagoon/mariadb-drupal
+    image: ${MARIADB_DATA_IMAGE:-govcmslagoon/mariadb-drupal}
     labels:
-      lagoon.type: mariadb-shared
+      lagoon.type: mariadb
+      lagoon.image: govcmslagoon/mariadb-drupal
     ports:
       - "3306" # Find port on host with `docker-compose port mariadb 3306`
     environment:

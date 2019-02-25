@@ -1,6 +1,6 @@
 FROM govcmslagoon/test
 
-COPY themes/ /app/profiles/govcms/themes/custom
+COPY themes/ /app/sites/default/themes/custom
 
 RUN rm -Rf /app/tests/behat/features/*
 COPY tests/behat/features/ /app/tests/behat/features
