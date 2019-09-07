@@ -88,4 +88,4 @@ If the project isn't behaving as expected you can try to force all containers to
         Windows:    docker-compose build --no-cache
                     docker-compose up -d --force-recreate
                     
-and follow the [Lagoon troubleshooting instructions](https://docs.amazee.io/local_docker_development/troubleshooting.html).
+If that doesn't work follow the [Lagoon troubleshooting instructions](https://docs.amazee.io/local_docker_development/troubleshooting.html).
