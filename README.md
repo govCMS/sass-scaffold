@@ -1,8 +1,10 @@
 # GovCMS Project Scaffolding
 
-## Known Issues
+## About this project
 
-* This repository is still a Work-in-Progress, and may be subject to slight alterations
+* This project is for setting up the framework for running the govCMS PaaS environment, but DOES NOT include Drupal! You need to add that yourself if you want it (see Project Setup steps below)
+* This Scaffolding PaaS project is not designed to run locally out of the box! It can be tweaked to do so however, read on for details.
+* This repository is still a Work-in-Progress, and may be subject to slight alterations. If something doesn't work or make sense, [lodge an issue or suggest a fix]()!
 * This process only applies to the [7.x-3.x](https://github.com/govCMS/govcms/tree/7.x-3.x) branch of GovCMS
 
 ## Requirements and Preliminary Setup
@@ -21,6 +23,8 @@
 
 * [Ahoy (optional)](https://github.com/ahoy-cli/ahoy#installation) - The commands are listed in `.ahoy.yml` all include their docker-compose versions for use on Windows, or on systems without Ahoy.
 
+* Drupal 7 (optional) - Only if you want to run a site inside this project. Either use a [fresh install from Drupal.org](https://www.drupal.org/project/drupal), or a [Dockerized pre-existing site](https://lagoon.readthedocs.io/en/latest/using_lagoon/drupal/lagoonize/).
+
 ## Project Setup
 
 1. Checkout project repo and confirm the path is in Docker's file sharing config (https://docs.docker.com/docker-for-mac/#file-sharing):
@@ -28,20 +32,29 @@
         Mac/Linux: git clone https://www.github.com/govcms/govcms7-scaffold.git {INSERT_PROJECT_NAME} && cd $_
         Windows:   git clone https://www.github.com/govcms/govcms7-scaffold.git {INSERT_PROJECT_NAME}; cd {INSERT_PROJECT_NAME}
 
-2. Build and start the containers:
+2. Build the containers:
+
+        Mac/Linux:  ahoy build
+        Windows:    docker-compose up -d --build
+
+3. Start the containers:
 
         Mac/Linux:  ahoy up
         Windows:    docker-compose up -d
 
-3. Install GovCMS:
+**Your PaaS instance should now be running!
 
-        Mac/Linux:  ahoy install
-        Windows:    docker-compose exec -T test drush si -y govcms
+If you want to run Drupal within it:
 
-4. Login to Drupal:
+4. Copy a fresh or Dockerized Drupal project into the `/docroot` folder. If it's a fresh install:
 
-        Mac/Linux:  ahoy login
-        Windows:    docker-compose exec -T test drush uli
+    a. Visit the URL specified in `docker-compose.yml` under `&lagoon-local-dev-url`
+    
+    b. You should see the Drupal 'Install Drupal' screen. Under 'Advanced', change the host from `localhost` to `mariadb`, and set the database name, username, and password as `drupal`.
+
+5. If using a Dockerized pre-existing site:
+
+    a. @TODO
 
 ## Commands
 
