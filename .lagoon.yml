@@ -9,8 +9,6 @@ tasks:
 
 environments:
   master:
-    types:
-      mariadb: mariadb-shared
     cronjobs:
       - name: drush cron
         schedule: "0 * * * *"
