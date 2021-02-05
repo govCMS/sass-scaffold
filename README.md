@@ -73,6 +73,22 @@ The GovCMS projects have been designed to be able to import a nightly copy of th
 * The files folder is not (currently) committed to GitLab.
 * Do not make changes to `docker-compose.yml`, `lagoon.yml`, `.gitlab-ci.yml` or the Dockerfiles under `/.docker` - these will result in your project being unable to deploy to GovCMS SaaS
 
+## Local Development - enable XDEBUG
+Please find below the steps to enable XDEBUG on your local environment. 
+The instructions are specific to PHPStorm and Chrome.
+
+### Edit docker-compose.yml 
+* Search for this line `X_FRAME_OPTIONS: ${X_FRAME_OPTIONS:-SameOrigin}`
+* Add this line after the above - `XDEBUG_ENABLE: "true"`
+DO NOT COMMIT THIS FILE
+
+### Copy docker folder to the host
+* `docker cp govcms7-scaffold_test_1:/app .`
+
+### Add server settings to PHPStorm
+The settings can be seen in the screenshot below:
+![alt text](/PHPStorm_server_settings.png?raw=true "PHPStorm")
+
 ## Image inheritance
 
 This project is designed to provision a Drupal 7 project onto GovCMS SaaS, using the GovCMS distribution, and has been prepared thus
