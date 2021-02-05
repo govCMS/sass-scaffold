@@ -16,7 +16,7 @@ is kept here.
         gem install pygmy
         pygmy up
 
-* [Windows](https://docs.amazee.io/local_docker_development/windows.html):    
+* [Windows](https://docs.amazee.io/local_docker_development/windows.html):
 
         git clone https://github.com/amazeeio/amazeeio-docker-windows amazeeio-docker-windows; cd amazeeio-docker-windows
         docker-compose up -d; cd ..
@@ -80,3 +80,14 @@ This project is designed to provision a Drupal 7 project onto GovCMS SaaS, using
 1. The vanilla GovCMS (7.x-3.x) Distribution is available at [Github Source](https://github.com/govcms/govcms) and as [Public DockerHub images](https://hub.docker.com/r/govcms)
 2. Those GovCMS images are then customised for Lagoon and GovCMS, and are available at [Github Source](https://github.com/govcms/govcmslagoon) and as [Public DockerHub images](https://hub.docker.com/r/govcmslagoon)
 3. Those GovCMSlagoon images are then retrieved in this scaffold repository.
+
+## Shield
+
+The `settings.php` file has environment variable support to configure basic authentication.
+
+### Updating passwords
+
+- `.lagoon.env`: Will have the default password for all Lagoon environments.
+- `.lagoon.env.master`: Allows a password to be added specifically for the production environment.
+
+> Note empty values will result in shield being disabled.
