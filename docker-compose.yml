@@ -107,7 +107,11 @@ services:
 
   # Lodge a support ticket to have Solr enabled.
   # solr:
-  #   image: govcmslagoon/solr
+  #   build:
+  #     context: .
+  #     dockerfile: .docker/Dockerfile.solr
+  #     args:
+  #       GOVCMS_IMAGE_VERSION: *govcms-image-version
   #   labels:
   #     lagoon.type: solr
   #   ports:
