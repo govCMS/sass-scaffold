@@ -32,8 +32,9 @@ is kept here.
 
 2. Build and start the containers:
 
-        Mac/Linux:  ahoy up
-        Windows:    docker-compose up -d
+        Mac/Linux:  ahoy init
+        Windows:    docker-compose build --no-cache 
+                    docker-compose up -d
 
 3. Install GovCMS:
 
@@ -80,3 +81,13 @@ This project is designed to provision a Drupal 7 project onto GovCMS SaaS, using
 1. The vanilla GovCMS (7.x-3.x) Distribution is available at [Github Source](https://github.com/govcms/govcms) and as [Public DockerHub images](https://hub.docker.com/r/govcms)
 2. Those GovCMS images are then customised for Lagoon and GovCMS, and are available at [Github Source](https://github.com/govcms/govcmslagoon) and as [Public DockerHub images](https://hub.docker.com/r/govcmslagoon)
 3. Those GovCMSlagoon images are then retrieved in this scaffold repository.
+
+## Troubleshooting
+
+If the project isn't behaving as expected you can try to force all containers to rebuild with:
+        
+        Mac/Linux:  ahoy rebuild
+        Windows:    docker-compose build --no-cache
+                    docker-compose up -d --force-recreate
+                    
+If that doesn't work follow the [Lagoon troubleshooting instructions](https://docs.amazee.io/local_docker_development/troubleshooting.html).

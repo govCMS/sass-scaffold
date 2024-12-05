@@ -6,6 +6,18 @@ commands:
     usage: Build project.
     cmd: docker-compose up -d "$@";
 
+  init:
+    usage: Build the project from scratch with the latest versions of all containers.
+    cmd: |
+      ahoy rebuild
+      echo "If that all went well, you should be ready to run: ahoy install"
+
+  rebuild:
+    usage: Force all containers to be rebuilt from source (useful if you're getting stuck with old or mixed up containers)
+    cmd: |
+      docker-compose build --no-cache
+      docker-compose up -d --force-recreate
+
   down:
     usage: Delete project (CAUTION).
     cmd: |
